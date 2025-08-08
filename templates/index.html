@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="flex flex-col w-full max-w-lg h-[80vh] bg-white rounded-xl shadow-lg p-4">
+        <!-- Where all the chat messages will appear -->
+        <div id="chatBox" class="flex-grow overflow-y-auto space-y-4 p-2">
+            <!-- First message from the bot -->
+            <div class="flex justify-start">
+                <div class="bg-gray-200 text-gray-800 rounded-lg p-3 max-w-xs">
+                    <p>Hello! How can I help you today?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The area where you type messages and the send button -->
+        <div class="flex items-center space-x-2 pt-4 border-t border-gray-200">
+            <input type="text" id="inputField" placeholder="Say something..." class="flex-grow p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <button id="sendBtn" class="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-200">
+                Send
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Get the parts of our web page we need to use
+        const chatBox = document.getElementById('chatBox');
+        const inputField = document.getElementById('inputField');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        // We'll use these to make sure the app works right away
+        sendBtn.disabled = false;
+        inputField.disabled = false;
+
+        // A simple function to add a new message to the chat
+        function showMessage(text, sender) {
+            const messageRow = document.createElement('div');
+            const messageBubble = document.createElement('div');
+            messageBubble.textContent = text;
+            
+            if (sender === 'user') {
+                messageRow.className = "flex justify-end";
+                messageBubble.className = "bg-blue-500 text-white rounded-lg p-3 max-w-xs";
+            } else {
+                messageRow.className = "flex justify-start";
+                messageBubble.className = "bg-gray-200 text-gray-800 rounded-lg p-3 max-w-xs";
+            }
+            
+            messageRow.appendChild(messageBubble);
+            chatBox.appendChild(messageRow);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // What to do when the user sends a message
+        async function sendUserMessage() {
+            const userText = inputField.value.trim();
+            if (userText === '') return; // Don't do anything if the message is empty
+
+            showMessage(userText, 'user');
+            inputField.value = '';
+            
+            // Turn off the input field while we wait for a reply
+            sendBtn.disabled = true;
+            inputField.disabled = true;
+
+            try {
+                // Send the message to the server
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: userText })
+                });
+
+                // Check if the server gave a good response
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Something went wrong on the server.");
+                }
+
+                // Read the reply from the server
+                const data = await response.json();
+                
+                // Show the reply from the bot
+                showMessage(data.response, 'bot');
+            } catch (error) {
+                console.error("Error talking to the server:", error);
+                showMessage(`Sorry, something went wrong: ${error.message}`, 'bot');
+            }
+
+            // Turn the input field back on
+            sendBtn.disabled = false;
+            inputField.disabled = false;
+            inputField.focus(); // Put the cursor back in the text box
+        }
+
+        // When you click the button or press enter, send the message
+        sendBtn.addEventListener('click', sendUserMessage);
+        inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendUserMessage();
+            }
+        });
+    </script>
+</body>
+</html>
