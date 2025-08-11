@@ -1,16 +1,23 @@
-# Import necessary modules
 import os
 import requests
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
 # Initialize Flask app and load environment variables
 app = Flask(__name__)
 load_dotenv()
 
+# Prometheus counter
+REQUEST_COUNT = Counter('chatbot_requests_total', 'Total chatbot API requests')
+
 # Get API key and URL from environment variables
 API_KEY = os.getenv("API_KEY")
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={API_KEY}"
+
+@app.before_request
+def before_request():
+    REQUEST_COUNT.inc()
 
 @app.route('/')
 def index():
@@ -39,12 +46,10 @@ def generate_text():
             ]
         }
 
-        # Make the API call and handle errors
         response = requests.post(API_URL, json=payload)
         response.raise_for_status()
         result = response.json()
         
-        # Check for a valid response from the model
         if result.get('candidates') and result['candidates']:
             text_response = result['candidates'][0]['content']['parts'][0]['text']
             return jsonify({"response": text_response})
@@ -58,5 +63,15 @@ def generate_text():
         app.logger.error(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An unexpected error occurred."}), 500
 
+@app.route('/health')
+def health():
+    """Health check endpoint."""
+    return jsonify({"status": "ok"}), 200
+
+@app.route('/metrics')
+def metrics():
+    """Prometheus metrics endpoint."""
+    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
