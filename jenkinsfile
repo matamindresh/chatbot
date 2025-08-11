@@ -34,9 +34,9 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'aks-config', variable: 'KUBECONFIG')]) {
                     sh '''
+                        kubectl --kubeconfig=$KUBECONFIG apply -f kubernetes/secret.yaml
                         kubectl --kubeconfig=$KUBECONFIG apply -f kubernetes/deployment.yaml
                         kubectl --kubeconfig=$KUBECONFIG apply -f kubernetes/service.yaml
-                        kubectl --kubeconfig=$KUBECONFIG apply -f kubernetes/secrect.yaml
                         kubectl --kubeconfig=$KUBECONFIG rollout status deployment/chatbot
                     '''
                 }
@@ -44,4 +44,3 @@ pipeline {
         }
     }
 }
-
