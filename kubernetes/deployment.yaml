@@ -25,4 +25,5 @@ spec:
                 secretKeyRef:
                   name: gemini-secret
                   key: API_KEY
-
+      imagePullSecrets:
+        - name: regcred
