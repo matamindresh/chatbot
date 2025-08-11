@@ -1,23 +1,15 @@
 import os
 import requests
 from flask import Flask, request, jsonify, render_template
-from dotenv import load_dotenv
-from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
-# Initialize Flask app and load environment variables
+# Initialize Flask app
 app = Flask(__name__)
-load_dotenv()
 
-# Prometheus counter
-REQUEST_COUNT = Counter('chatbot_requests_total', 'Total chatbot API requests')
-
-# Get API key and URL from environment variables
+# Get API key from environment variables
 API_KEY = os.getenv("API_KEY")
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={API_KEY}"
 
-@app.before_request
-def before_request():
-    REQUEST_COUNT.inc()
+# Set the API URL to use a stable model
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={API_KEY}"
 
 @app.route('/')
 def index():
@@ -26,8 +18,9 @@ def index():
 
 @app.route('/api/generate', methods=['POST'])
 def generate_text():
-    """Handles the user's prompt and sends it to the Gemini API."""
+    """Handles user prompts and sends them to the Gemini API."""
     if not API_KEY:
+        app.logger.error("API key is not set.")
         return jsonify({"error": "API key not set"}), 500
 
     try:
@@ -37,16 +30,21 @@ def generate_text():
         if not prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
+        # Correct payload format for the Gemini API
         payload = {
- 		   "prompt": {
-        	 		"text": prompt
-    			     }
-		  }
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
 
         response = requests.post(API_URL, json=payload)
-        response.raise_for_status()
+        response.raise_for_status()  # This will raise an exception for HTTP errors
         result = response.json()
-        
+
         if result.get('candidates') and result['candidates']:
             text_response = result['candidates'][0]['content']['parts'][0]['text']
             return jsonify({"response": text_response})
@@ -60,15 +58,7 @@ def generate_text():
         app.logger.error(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An unexpected error occurred."}), 500
 
-@app.route('/health')
-def health():
-    """Health check endpoint."""
-    return jsonify({"status": "ok"}), 200
-
-@app.route('/metrics')
-def metrics():
-    """Prometheus metrics endpoint."""
-    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    # This block is for local development only.
+    # For production, use a WSGI server like Gunicorn.
+    app.run(host='0.0.0.0', debug=True)
