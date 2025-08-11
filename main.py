@@ -38,13 +38,10 @@ def generate_text():
             return jsonify({"error": "No prompt provided"}), 400
 
         payload = {
-            "contents": [
-                {
-                    "role": "user",
-                    "parts": [{"text": prompt}]
-                }
-            ]
-        }
+ 		   "prompt": {
+        	 		"text": prompt
+    			     }
+		  }
 
         response = requests.post(API_URL, json=payload)
         response.raise_for_status()
