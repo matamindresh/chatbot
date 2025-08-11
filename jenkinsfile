@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "matamindresh/chatbot"
+        DOCKER_IMAGE = "mindresh/chatbot"
         DOCKER_TAG = "latest"
     }
 
