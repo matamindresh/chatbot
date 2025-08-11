@@ -15,9 +15,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
-                }
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
 
@@ -37,6 +35,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'aks-config', variable: 'KUBECONFIG')]) {
                     sh '''
                         kubectl --kubeconfig=$KUBECONFIG apply -f kubernetes/deployment.yaml
+                        kubectl --kubeconfig=$KUBECONFIG apply -f kubernetes/service.yaml
                         kubectl --kubeconfig=$KUBECONFIG rollout status deployment/chatbot
                     '''
                 }
@@ -44,3 +43,4 @@ pipeline {
         }
     }
 }
+
