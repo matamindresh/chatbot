@@ -19,3 +19,10 @@ spec:
           image: mindresh/chatbot:latest
           ports:
             - containerPort: 5000
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-secret
+                  key: API_KEY
+

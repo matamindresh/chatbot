@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gemini-secret
+type: Opaque
+stringData:
+  API_KEY: "AIzaSyDXx6tUzKvNa5HfalaP1no99Dv69-pONHo"
