@@ -1,11 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot
-  labels:
-    app: chatbot
+  name: chatbot-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: chatbot
@@ -15,15 +13,13 @@ spec:
         app: chatbot
     spec:
       containers:
-        - name: chatbot
-          image: mindresh/chatbot:latest
-          ports:
-            - containerPort: 5000
-          env:
-            - name: API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: gemini-secret
-                  key: API_KEY
-      imagePullSecrets:
-        - name: regcred
+      - name: chatbot-container
+        image: mindresh/chatbot:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gemini-api-key-secret
+              key: API_KEY
