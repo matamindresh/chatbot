@@ -19,7 +19,4 @@ spec:
         - containerPort: 5000
         env:
         - name: API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: gemini-api-key-secret
-              key: API_KEY
+          value: "AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU"
