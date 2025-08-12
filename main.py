@@ -2,22 +2,13 @@ import os
 import requests
 from flask import Flask, request, jsonify, render_template
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# ---
-# CRITICAL: Do NOT hardcode your API key.
-# It should always be loaded from an environment variable for security.
-# This ensures your key is never committed to Git.
-#
-# To run this locally, set the environment variable:
-#   export API_KEY="your_api_key_here"
-# ---
-# API_KEY = os.getenv("API_KEY")
 
-API_KEY="AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU"
+API_KEY = os.getenv("API_KEY")
 
-# Set the API URL to use a stable model
+# API_KEY="AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU"
+
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={API_KEY}"
 
 @app.route('/')
@@ -39,7 +30,6 @@ def generate_text():
         if not prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        # Correct payload format for the Gemini API, including the 'role'
         payload = {
             "contents": [
                 {
@@ -51,10 +41,8 @@ def generate_text():
             ]
         }
 
-        # Make the synchronous API call using the 'requests' library.
-        # Note: For production use, consider an async framework to prevent blocking.
         response = requests.post(API_URL, json=payload)
-        response.raise_for_status()  # Raises an exception for bad HTTP status codes
+        response.raise_for_status()  
         result = response.json()
 
         if result.get('candidates') and result['candidates']:
@@ -72,6 +60,4 @@ def generate_text():
         return jsonify({"error": "An unexpected error occurred."}), 500
 
 if __name__ == '__main__':
-    # This block is for local development only.
-    # For production, use a WSGI server like Gunicorn.
     app.run(host='0.0.0.0', port=5000, debug=True)
