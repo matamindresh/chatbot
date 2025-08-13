@@ -12,8 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
-# ENV API_KEY=AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU
-
+ENV API_KEY=AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU
+# 
+# 
 # Expose the application port
 EXPOSE 5000
 
