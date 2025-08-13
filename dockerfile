@@ -13,10 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV API_KEY=AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU
-# 
-# 
-# Expose the application port
-EXPOSE 5000
 
 # Correct CMD syntax (needs a space after CMD)
 CMD ["python3", "main.py"]
