@@ -1,14 +1,14 @@
 import os
 import requests
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS  # <-- Import CORS
 
 app = Flask(__name__)
 
+# Enable CORS for all routes and all origins
+CORS(app, resources={r"/": {"origins": ""}})
 
 API_KEY = os.getenv("API_KEY")
-
-# API_KEY="AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU"
-
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={API_KEY}"
 
 @app.route('/')
@@ -42,7 +42,7 @@ def generate_text():
         }
 
         response = requests.post(API_URL, json=payload)
-        response.raise_for_status()  
+        response.raise_for_status()
         result = response.json()
 
         if result.get('candidates') and result['candidates']:
@@ -60,4 +60,5 @@ def generate_text():
         return jsonify({"error": "An unexpected error occurred."}), 500
 
 if __name__ == '__main__':
+    # In Kubernetes, host should be 0.0.0.0
     app.run(host='0.0.0.0', port=5000, debug=True)
