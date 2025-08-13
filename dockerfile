@@ -14,5 +14,6 @@ COPY . .
 
 ENV API_KEY=AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU
 
+EXPOSE 5000
 # Correct CMD syntax (needs a space after CMD)
 CMD ["python3", "main.py"]
