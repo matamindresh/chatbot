@@ -8,8 +8,8 @@ app = Flask(__name__)
 # Enable CORS for all routes and all origins
 CORS(app, resources={r"/": {"origins": ""}})
 
-# API_KEY = os.getenv("API_KEY")
-API_KEY="AIzaSyABaZT80ukPbyZgcww2sPyTw1cWtnvwhVU"
+API_KEY = os.getenv("API_KEY")
+
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={API_KEY}"
 
 @app.route('/')
