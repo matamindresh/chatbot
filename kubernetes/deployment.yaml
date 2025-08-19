@@ -17,4 +17,14 @@ spec:
         image: mindresh/chatbot:latest
         ports:
         - containerPort: 5000
-       
+        env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: chatbot-secret
+              key: API_KEY
+        - name: API_URL
+          valueFrom:
+            secretKeyRef:
+              name: chatbot-secret
+              key: API_URL
