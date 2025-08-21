@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot-deployment
+  name: chatbot
 spec:
   replicas: 1
   selector:
