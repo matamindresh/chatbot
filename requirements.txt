@@ -3,3 +3,5 @@ python-dotenv
 requests
 prometheus_client
 flask-cors
+flask_sqlalchemy
+prometheus-flask-exporter

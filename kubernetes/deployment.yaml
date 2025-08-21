@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot
+  name: chatbot-deployment
 spec:
   replicas: 1
   selector:
@@ -13,8 +13,8 @@ spec:
         app: chatbot
     spec:
       containers:
-      - name: chatbot-container
-        image: mindresh/chatbot:latest
+      - name: chatbot
+        image: mindresh/chatbotdb:latest  
         ports:
         - containerPort: 5000
         env:
@@ -23,8 +23,3 @@ spec:
             secretKeyRef:
               name: chatbot-secret
               key: API_KEY
-        - name: API_URL
-          valueFrom:
-            secretKeyRef:
-              name: chatbot-secret
-              key: API_URL
