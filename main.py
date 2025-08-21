@@ -94,5 +94,4 @@ def show_routes():
     return str(app.url_map)
 
 if __name__ == '__main__':
-    print("Registered routes:", app.url_map)  # should include /metrics
     app.run(host="0.0.0.0", port=5000, debug=True)
