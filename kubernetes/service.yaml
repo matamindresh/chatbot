@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: chatbot-service
 spec:
-  type: LoadBalancer
   selector:
     app: chatbot
+  type: LoadBalancer
   ports:
-    - port: 5000
-      targetPort: 5000
-      nodePort: 30002
+    - protocol: TCP
+      port: 80        
+      targetPort: 5000  
